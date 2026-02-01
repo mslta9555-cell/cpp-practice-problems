@@ -1,0 +1,172 @@
+// Problem_5
+// Hiring eligibility check with recommendation support
+
+#include <iostream>
+#include <limits>
+#include <cctype>
+#include <string>
+
+// Constants for age limits and hiring rules
+constexpr int MIN_AGE = 1;
+constexpr int MAX_AGE = 100;
+constexpr int HIRE_AGE = 21;
+
+// Clears input buffer to avoid invalid input issues
+void clearInputLine()
+{
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+// Stores personal information
+struct PersonInfo
+{
+    int age{};
+    bool hasDriverLicense{};
+    bool hasRecommendation{};
+};
+
+// Validates age range
+bool isValidAge(int age)
+{
+    return age >= MIN_AGE && age <= MAX_AGE;
+}
+
+// Determines if the person can be hired
+bool canBeHired(const PersonInfo& person)
+{
+    // Recommendation overrides all other conditions
+    if (person.hasRecommendation)
+        return true;
+
+    // Otherwise, age and driver's license are required
+    return (person.age >= HIRE_AGE && person.hasDriverLicense);
+}
+
+// Reads and validates age input
+int readAge()
+{
+    int age;
+    while (true)
+    {
+        std::cout << "Enter age (" << MIN_AGE << "-" << MAX_AGE << "): ";
+        std::cin >> age;
+
+        if (std::cin.fail())
+        {
+            std::cout << "❌ Please enter a valid number.\n";
+            clearInputLine();
+            continue;
+        }
+
+        if (!isValidAge(age))
+        {
+            std::cout << "❌ Age must be between "
+                      << MIN_AGE << " and " << MAX_AGE << ".\n";
+            clearInputLine();
+            continue;
+        }
+
+        clearInputLine();
+        return age;
+    }
+}
+
+// Generic function to read Yes/No input
+bool readYesNo(const std::string& message)
+{
+    int input;
+    while (true)
+    {
+        std::cout << message;
+        std::cin >> input;
+
+        if (std::cin.fail() || (input != 0 && input != 1))
+        {
+            std::cout << "❌ Please enter 1 or 0.\n";
+            clearInputLine();
+            continue;
+        }
+
+        clearInputLine();
+        return input == 1;
+    }
+}
+
+// Reads all required person data
+PersonInfo readPersonInfo()
+{
+    PersonInfo person;
+
+    // If person has a recommendation, no need to ask further
+    person.hasRecommendation =
+        readYesNo("Do you have a recommendation? (1 = Yes, 0 = No): ");
+
+    if (person.hasRecommendation)
+        return person;
+
+    person.age = readAge();
+    person.hasDriverLicense =
+        readYesNo("Do you have a driver's license? (1 = Yes, 0 = No): ");
+
+    return person;
+}
+
+// Prints hiring decision details
+void printDecision(const PersonInfo& person)
+{
+    std::cout << "\n--- HIRE DECISION ---\n";
+
+    if (!person.hasRecommendation)
+    {
+        std::cout << "Age: " << person.age << '\n';
+        std::cout << "License: "
+                  << (person.hasDriverLicense ? "Yes" : "No") << '\n';
+    }
+    else
+    {
+        std::cout << "Age: N/A\n";
+        std::cout << "License: N/A\n";
+    }
+
+    std::cout << "Recommendation: "
+              << (person.hasRecommendation ? "Yes" : "No") << '\n';
+
+    std::cout << "Result: "
+              << (canBeHired(person) ? "✅ HIRED" : "❌ REJECTED") << "\n";
+}
+
+// Asks user if they want to repeat the program
+bool doYouWantToRepeat()
+{
+    char answer;
+    do
+    {
+        std::cout << "\n🔁 Do you want to repeat the program? (y/n): ";
+        std::cin >> answer;
+        clearInputLine();
+
+        answer = static_cast<char>(std::tolower(static_cast<unsigned char>(answer)));
+        if (answer == 'y') return true;
+        if (answer == 'n') return false;
+
+        std::cout << "❌ Invalid input! Please enter y or n.\n";
+    } while (true);
+}
+
+// Controls program flow
+void runProgram()
+{
+    do
+    {
+        PersonInfo person = readPersonInfo();
+        printDecision(person);
+    } while (doYouWantToRepeat());
+}
+
+int main()
+{
+    runProgram();
+    std::cout << "\nThanks for using this program\n";
+    return 0;
+}
