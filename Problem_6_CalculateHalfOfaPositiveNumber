@@ -1,0 +1,106 @@
+// Problem_6
+// ------------------------------------------
+// ✅ This program reads a positive number from the user,
+// calculates its half, and displays the result.
+// The user can choose to repeat the program.
+// ------------------------------------------
+
+#include <iostream>
+#include <limits>
+#include <cctype>
+
+constexpr float HALF_DIVISOR = 2.0f;
+
+// Helper: clear and discard rest of the line
+void clearInputLine()
+{
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+// ✅ Reads a positive number safely from the user.
+// Keeps asking until valid input is entered.
+float readPositiveNumber()
+{
+    float number;
+
+    do
+    {
+        std::cout << "\nPlease enter a number : ";
+        std::cin >> number;
+
+        // Check for invalid (non-numeric) input
+        if (std::cin.fail())
+        {
+            std::cout << "❌ Invalid Input! Please enter a number.\n";
+            clearInputLine();
+            continue;
+        }
+        // Check for non-positive input
+        else if (number <= 0)
+        {
+            std::cout << "❌ Invalid Input! Please enter a positive number.\n";
+            clearInputLine();
+            continue;
+        }
+        else
+        {
+            // Valid number
+            clearInputLine();
+            return number;
+        }
+    } while (true);
+}
+
+// ✅ Returns half of the given number.
+float calculateHalf(float Number)
+{
+    return Number / HALF_DIVISOR;
+}
+
+// ✅ Displays the result to the user in a clean format.
+void printResult(float number, float result)
+{
+    std::cout << "\nHalf of " << number << " is " << result << std::endl;
+}
+
+// ✅ Asks the user if they want to repeat the program.
+bool doYouWantToRepeat()
+{
+    char answer;
+
+    do
+    {
+        std::cout << "\n🔁 Do you want to repeat the program? (y/n): ";
+        std::cin >> answer;
+       clearInputLine();
+
+        answer = static_cast<char>(std::tolower(static_cast<unsigned char>(answer)));
+
+        if (answer == 'y') return true;
+        if (answer == 'n') return false;
+
+        std::cout << "❌ Invalid input! Please enter y or n.\n";
+
+    } while (true);
+}
+
+// ✅ Controls the overall flow of the program.
+void runProgram()
+{
+    do
+    {
+        float number = readPositiveNumber();   // Step 1: Get input
+        float result = calculateHalf(number);  // Step 2: Process
+        printResult(number, result);           // Step 3: Output result
+
+    } while (doYouWantToRepeat()); // Step 4: Ask to repeat
+}
+
+// ✅ Entry point of the program
+int main()
+{
+    runProgram();
+    std::cout << "\nThanks for using this program\n";
+    return 0;
+}
